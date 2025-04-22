@@ -1,54 +1,50 @@
 using System.Net;
-using System.Text.Json;
 
-namespace APILayer.Middleware
+namespace VisualFXVault.API.Middlewares;
+
+public class ExceptionHandlingMiddleware
 {
-    public class ExceptionHandlingMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<ExceptionHandlingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
-
-        public async Task InvokeAsync(HttpContext context)
-        {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unhandled exception occurred.");
-                await HandleExceptionAsync(context, ex);
-            }
-        }
-
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-            var response = new
-            {
-                StatusCode = context.Response.StatusCode,
-                Message = "An internal server error occurred. Please try again later.",
-
-            };
-
-            var jsonResponse = JsonSerializer.Serialize(response);
-            return context.Response.WriteAsync(jsonResponse);
-        }
+        _next = next;
+        _logger = logger;
     }
 
-    public static class ExceptionHandlingMiddlewareExtensions
+    public async Task InvokeAsync(HttpContext httpContext)
     {
-        public static IApplicationBuilder UseExceptionHandlingMiddleware(this IApplicationBuilder builder)
+        try
         {
-            return builder.UseMiddleware<ExceptionHandlingMiddleware>();
+            await _next(httpContext);
         }
+        catch (Exception ex)
+        {
+            _logger.LogError($"{ex.GetType()}: {ex.Message}\n{ex.StackTrace}");
+
+            if (ex.InnerException != null)
+            {
+                _logger.LogError($"{ex.InnerException.GetType()}: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}");
+            }
+
+            httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            await httpContext.Response.WriteAsJsonAsync(new
+            {
+                Message = ex.Message,
+                Type = ex.GetType().Name,
+            });
+        }
+    }
+}
+
+public static class ExceptionHandlingMiddlewareExtensions
+{
+    public static IApplicationBuilder UseExceptionHandling(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<ExceptionHandlingMiddleware>();
     }
 }

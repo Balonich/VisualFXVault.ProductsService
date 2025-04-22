@@ -1,0 +1,18 @@
+using AutoMapper;
+using BusinessLogicLayer.DTOs;
+using DataAccessLayer.Entities;
+
+namespace BusinessLogicLayer.Mappers;
+
+public class ProductAddRequestMappingProfile : Profile
+{
+    public ProductAddRequestMappingProfile()
+    {
+        CreateMap<ProductAddRequestDto, Product>()
+            .ForMember(dest => dest.ProductID, opt => opt.MapFrom(src => Guid.NewGuid()))
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.ProductName))
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+            .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.UnitPrice))
+            .ForMember(dest => dest.QuantityInStock, opt => opt.MapFrom(src => src.QuantityInStock));
+    }
+}
