@@ -21,42 +21,42 @@ Used technologies:
 
 ### Data Access Layer
 
-- [ ] Add `Product` Entity with the following properties:
+- [x] Add `Product` Entity with the following properties:
     - `ProductID` (GUID, primary key)
     - `ProductName` (string)
     - `Category` (string)
     - `UnitPrice` (double, nullable)
     - `QuantityInStock` (int, nullable)
-- [ ] Add `ApplicationDbContext`
-- [ ] Add `IProductsRepository` with the following methods:
+- [x] Add `ApplicationDbContext`
+- [x] Add `IProductsRepository` with the following methods:
     - `GetProducts()` - to retrieve all products.
     - `GetProductByCondition()` - to retrieve a product by a specific condition.
     - `AddProduct()` - to add a new product.
     - `UpdateProduct()` - to update an existing product.
     - `DeleteProduct()` - to delete a product by its ID.
-- [ ] Implement `IProductsRepository` in the `ProductsRepository` class
-- [ ] Add `DependencyInjection` class
+- [x] Implement `IProductsRepository` in the `ProductsRepository` class
+- [x] Add `DependencyInjection` class
 
 ### Business Logic Layer
 
-- [ ] Add DTOs
-    - [ ] `ProductResponse`: Contains data to return in API responses.
-    - [ ] `ProductAddRequest`: For adding a new product.
-    - [ ] `ProductUpdateRequest`: For updating an existing product.
-- [ ] Add `ProductService`. This service will:
+- [x] Add DTOs
+    - [x] `ProductResponse`: Contains data to return in API responses.
+    - [x] `ProductAddRequest`: For adding a new product.
+    - [x] `ProductUpdateRequest`: For updating an existing product.
+- [x] Add `ProductService`. This service will:
     - Retrieve all products or products by specific conditions.
     - Add, update, and delete products by interacting with the repository.
-- [ ] Create `ProductAddRequestValidator` and `ProductUpdateRequestValidator` with FluentValidation
+- [x] Create `ProductAddRequestValidator` and `ProductUpdateRequestValidator` with FluentValidation
 
 ### API Layer
-- [ ] Implement Minimal API endpoints:
-    - [ ] `GET /api/products`: Retrieve all products.
-    - [ ] `GET /api/products/search/product-id/{productId}`: Retrieve a product by ID.
-    - [ ] `GET /api/products/products/search/{searchString}`: Performs a "contains" search on product name or category name.
-    - [ ] `POST /api/products`: Add a new product.
-    - [ ] `PUT /api/products`: Update an existing product.
-    - [ ] `DELETE /api/products/{productId}`: Delete a product by ID.
-- [ ] Add exception handling middleware. This middleware should:
+- [x] Implement Minimal API endpoints:
+    - [x] `GET /api/products`: Retrieve all products.
+    - [x] `GET /api/products/search/product-id/{productId}`: Retrieve a product by ID.
+    - [x] `GET /api/products/products/search/{searchString}`: Performs a "contains" search on product name or category name.
+    - [x] `POST /api/products`: Add a new product.
+    - [x] `PUT /api/products`: Update an existing product.
+    - [x] `DELETE /api/products/{productId}`: Delete a product by ID.
+- [x] Add exception handling middleware. This middleware should:
     - Log exceptions.
     - Return a generic error response with a 500 status code if any unhandled exceptions occur.
-- [ ] Add Scalar UI for OpenAPI documentation
+- [x] Add Scalar UI for OpenAPI documentation
