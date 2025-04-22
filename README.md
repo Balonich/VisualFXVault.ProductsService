@@ -21,28 +21,28 @@ Used technologies:
 
 ### Data Access Layer
 
-- [ ] Add `Product` Entity with the following properties:
+- [x] Add `Product` Entity with the following properties:
     - `ProductID` (GUID, primary key)
     - `ProductName` (string)
     - `Category` (string)
     - `UnitPrice` (double, nullable)
     - `QuantityInStock` (int, nullable)
-- [ ] Add `ApplicationDbContext`
-- [ ] Add `IProductsRepository` with the following methods:
+- [x] Add `ApplicationDbContext`
+- [x] Add `IProductsRepository` with the following methods:
     - `GetProducts()` - to retrieve all products.
     - `GetProductByCondition()` - to retrieve a product by a specific condition.
     - `AddProduct()` - to add a new product.
     - `UpdateProduct()` - to update an existing product.
     - `DeleteProduct()` - to delete a product by its ID.
-- [ ] Implement `IProductsRepository` in the `ProductsRepository` class
-- [ ] Add `DependencyInjection` class
+- [x] Implement `IProductsRepository` in the `ProductsRepository` class
+- [x] Add `DependencyInjection` class
 
 ### Business Logic Layer
 
-- [ ] Add DTOs
-    - [ ] `ProductResponse`: Contains data to return in API responses.
-    - [ ] `ProductAddRequest`: For adding a new product.
-    - [ ] `ProductUpdateRequest`: For updating an existing product.
+- [x] Add DTOs
+    - [x] `ProductResponse`: Contains data to return in API responses.
+    - [x] `ProductAddRequest`: For adding a new product.
+    - [x] `ProductUpdateRequest`: For updating an existing product.
 - [ ] Add `ProductService`. This service will:
     - Retrieve all products or products by specific conditions.
     - Add, update, and delete products by interacting with the repository.
