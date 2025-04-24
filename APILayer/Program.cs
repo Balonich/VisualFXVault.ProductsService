@@ -1,7 +1,5 @@
 using APILayer.Extensions;
 using BusinessLogicLayer.Extensions;
-using BusinessLogicLayer.Mappers;
-using BusinessLogicLayer.Services;
 using DataAccessLayer.Database;
 using DataAccessLayer.Extensions;
 using FluentValidation.AspNetCore;
@@ -48,11 +46,11 @@ if (app.Environment.IsDevelopment())
 
     app.MapScalarApiReference();
 
-    // using (var scope = app.Services.CreateScope())
-    // {
-    //     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    //     dbContext.Database.Migrate();
-    // }
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.Migrate();
+    }
 }
 
 app.UseCors();
