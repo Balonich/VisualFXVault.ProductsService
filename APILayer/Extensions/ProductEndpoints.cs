@@ -68,7 +68,13 @@ public static class ProductEndpoints
             }
 
             var product = await productService.AddProductAsync(productAddRequest);
-            return Results.Created($"/api/products/{product.ProductID}", product);
+
+            if (product == null)
+            {
+                return Results.Problem("Failed to add product");
+            }
+
+            return Results.Created($"/api/products/search/product-id/{product.ProductID}", product);
         })
         .WithName("AddProduct")
         .WithDescription("Add a new product")
@@ -86,7 +92,8 @@ public static class ProductEndpoints
             }
 
             var product = await productService.UpdateProductAsync(productUpdateRequest);
-            return product != null ? Results.Ok(product) : Results.NotFound();
+
+            return product != null ? Results.Ok(product) : Results.Problem("Failed to update product");
         })
         .WithName("UpdateProduct")
         .WithDescription("Update an existing product")
@@ -98,7 +105,7 @@ public static class ProductEndpoints
         productGroup.MapDelete("/{productId:guid}", async (Guid productId, ProductService productService) =>
         {
             var result = await productService.DeleteProductAsync(productId);
-            return result ? Results.NoContent() : Results.NotFound();
+            return result ? Results.Ok(true) : Results.NotFound();
         })
         .WithName("DeleteProduct")
         .WithDescription("Delete a product by ID")

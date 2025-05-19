@@ -1,18 +1,29 @@
 using System.Linq.Expressions;
 using AutoMapper;
 using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.Validators;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Repositories.Products;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace BusinessLogicLayer.Services;
 
 public class ProductService
 {
+    private readonly IValidator<ProductAddRequestDto> _productAddRequestValidator;
+    private readonly IValidator<ProductUpdateRequestDto> _productUpdateRequestValidator;
     private readonly IProductsRepository _productRepository;
     private readonly IMapper _mapper;
 
-    public ProductService(IProductsRepository productRepository, IMapper mapper)
+    public ProductService(
+        IValidator<ProductAddRequestDto> productAddRequestValidator,
+        IValidator<ProductUpdateRequestDto> productUpdateRequestValidator,
+        IProductsRepository productRepository,
+        IMapper mapper)
     {
+        _productAddRequestValidator = productAddRequestValidator;
+        _productUpdateRequestValidator = productUpdateRequestValidator;
         _productRepository = productRepository;
         _mapper = mapper;
     }
@@ -45,31 +56,70 @@ public class ProductService
         return _mapper.Map<ProductResponseDto>(product);
     }
 
-    public async Task<ProductResponseDto> AddProductAsync(ProductAddRequestDto productAddRequest)
+    public async Task<ProductResponseDto?> AddProductAsync(ProductAddRequestDto productAddRequest)
     {
-        var product = _mapper.Map<Product>(productAddRequest);
-
-        product = await _productRepository.AddProductAsync(product);
-
-        if (product == null)
+        if (productAddRequest == null)
         {
-            throw new Exception("Failed to create product.");
+            throw new ArgumentNullException(nameof(productAddRequest));
         }
 
-        return _mapper.Map<ProductResponseDto>(product);
+        var validationResult = await _productAddRequestValidator.ValidateAsync(productAddRequest);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = string.Join(", ", validationResult.Errors.Select(temp => temp.ErrorMessage));
+            throw new ArgumentException(errors);
+        }
+
+        var productInput = _mapper.Map<Product>(productAddRequest);
+        var addedProduct = await _productRepository.AddProductAsync(productInput);
+
+        if (addedProduct == null)
+        {
+            return null;
+        }
+
+        var addedProductResponse = _mapper.Map<ProductResponseDto>(addedProduct);
+
+        return addedProductResponse;
     }
 
     public async Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateRequestDto productUpdateRequest)
     {
+        var existingProduct = await _productRepository.GetProductByConditionAsync(temp => temp.ProductID == productUpdateRequest.ProductID);
+
+        if (existingProduct == null)
+        {
+            throw new ArgumentException("Invalid Product ID");
+        }
+
+        var validationResult = await _productUpdateRequestValidator.ValidateAsync(productUpdateRequest);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = string.Join(", ", validationResult.Errors.Select(temp => temp.ErrorMessage));
+            throw new ArgumentException(errors);
+        }
+
+
         var product = _mapper.Map<Product>(productUpdateRequest);
 
-        product = await _productRepository.UpdateProductAsync(product);
+        var updatedProduct = await _productRepository.UpdateProductAsync(product);
 
-        return _mapper.Map<ProductResponseDto>(product);
+        var updatedProductResponse = _mapper.Map<ProductResponseDto>(updatedProduct);
+
+        return updatedProductResponse;
     }
 
     public async Task<bool> DeleteProductAsync(Guid productId)
     {
+        var existingProduct = await _productRepository.GetProductByConditionAsync(temp => temp.ProductID == productId);
+
+        if (existingProduct == null)
+        {
+            return false;
+        }
+
         return await _productRepository.DeleteProductAsync(productId);
     }
 }
