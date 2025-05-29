@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BusinessLogicLayer.DTOs;
 using BusinessLogicLayer.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 
 namespace APILayer.Extensions;
 
@@ -16,6 +17,7 @@ public static class ProductEndpoints
         GetAllProducts(productGroup);
         GetProduct(productGroup);
         GetProductsBySearchQuery(productGroup);
+        GetProductsByIds(productGroup);
         AddProduct(productGroup);
         UpdateProduct(productGroup);
         DeleteProduct(productGroup);
@@ -42,6 +44,43 @@ public static class ProductEndpoints
         })
         .WithName("GetProduct")
         .WithDescription("Get a product by ID")
+        .WithOpenApi();
+    }
+
+    private static void GetProductsByIds(RouteGroupBuilder productGroup)
+    {
+        productGroup.MapGet("/search/product-ids/{commaSeparatedProductIdsList}", async (string commaSeparatedProductIdsList, ProductService productService) =>
+        {
+            if (string.IsNullOrWhiteSpace(commaSeparatedProductIdsList))
+            {
+                return Results.BadRequest("Product IDs list cannot be empty");
+            }
+
+            var idStrings = commaSeparatedProductIdsList.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            if (idStrings.Length == 0)
+            {
+                return Results.BadRequest("At least one product ID is required or incorrect separator used, comma expected");
+            }
+
+            var productIds = new List<Guid>();
+            foreach (var idString in idStrings)
+            {
+                if (Guid.TryParse(idString.Trim(), out var guid))
+                {
+                    productIds.Add(guid);
+                }
+                else
+                {
+                    return Results.BadRequest($"Invalid GUID format: {idString}");
+                }
+            }
+
+            var products = await productService.GetProductsByIdsAsync(productIds);
+            return Results.Ok(products);
+        })
+        .WithName("GetProductsByIds")
+        .WithDescription("Get products by a list of IDs")
         .WithOpenApi();
     }
 

@@ -56,6 +56,14 @@ public class ProductService
         return _mapper.Map<ProductResponseDto>(product);
     }
 
+    public async Task<IEnumerable<ProductResponseDto>> GetProductsByIdsAsync(IEnumerable<Guid> productIds)
+    {
+        Expression<Func<Product, bool>> predicate = product => productIds.Contains(product.ProductID);
+        var products = await _productRepository.GetProductsByConditionAsync(predicate);
+
+        return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
+    }
+
     public async Task<ProductResponseDto?> AddProductAsync(ProductAddRequestDto productAddRequest)
     {
         if (productAddRequest == null)
