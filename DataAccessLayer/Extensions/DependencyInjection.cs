@@ -14,8 +14,10 @@ public static class DependencyInjection
 
         var connectionString = connectionStringTemplate
             .Replace("$SQLSERVER_HOST", Environment.GetEnvironmentVariable("SQLSERVER_HOST"))
+            .Replace("$SQLSERVER_PORT", Environment.GetEnvironmentVariable("SQLSERVER_PORT"))
             .Replace("$SQLSERVER_USER", Environment.GetEnvironmentVariable("SQLSERVER_USER"))
-            .Replace("$SQLSERVER_PASSWORD", Environment.GetEnvironmentVariable("SQLSERVER_PASSWORD"));
+            .Replace("$SQLSERVER_PASSWORD", Environment.GetEnvironmentVariable("SQLSERVER_PASSWORD"))
+            .Replace("$SQLSERVER_DATABASE", Environment.GetEnvironmentVariable("SQLSERVER_DATABASE"));
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));

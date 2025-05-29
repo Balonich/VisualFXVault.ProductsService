@@ -21,6 +21,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENV SQLSERVER_HOST=localhost
+ENV SQLSERVER_PORT=1433
+ENV SQLSERVER_DATABASE=VisualFXVault.ProductsService
 ENV SQLSERVER_USER=sa
 ENV SQLSERVER_PASSWORD=yourStrong(!)Password
 ENTRYPOINT ["dotnet", "APILayer.dll"]
