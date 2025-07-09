@@ -16,12 +16,13 @@ public class ProductsRepository : IProductsRepository
 
     public async Task<IEnumerable<Product>> GetProductsAsync()
     {
-        return await _dbContext.Products.ToListAsync();
+        return await _dbContext.Products.AsNoTracking().ToListAsync();
     }
 
     public async Task<IEnumerable<Product>> GetProductsByConditionAsync(Expression<Func<Product, bool>> predicate)
     {
         return await _dbContext.Products
+            .AsNoTracking()
             .Where(predicate)
             .ToListAsync();
     }
@@ -29,12 +30,14 @@ public class ProductsRepository : IProductsRepository
     public Task<Product?> GetProductAsync(Guid productId)
     {
         return _dbContext.Products
+            .AsNoTracking()
             .FirstOrDefaultAsync(p => p.ProductID == productId);
     }
 
     public Task<Product?> GetProductByConditionAsync(Expression<Func<Product, bool>> predicate)
     {
         return _dbContext.Products
+            .AsNoTracking()
             .FirstOrDefaultAsync(predicate);
     }
 

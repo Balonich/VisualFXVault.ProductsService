@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using AutoMapper;
 using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.MessageQueue.Interfaces;
+using BusinessLogicLayer.MessageQueue.Messages;
 using BusinessLogicLayer.Validators;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Repositories.Products;
@@ -15,17 +17,20 @@ public class ProductService
     private readonly IValidator<ProductUpdateRequestDto> _productUpdateRequestValidator;
     private readonly IProductsRepository _productRepository;
     private readonly IMapper _mapper;
+    private readonly IPublisher _publisher;
 
     public ProductService(
         IValidator<ProductAddRequestDto> productAddRequestValidator,
         IValidator<ProductUpdateRequestDto> productUpdateRequestValidator,
         IProductsRepository productRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IPublisher publisher)
     {
         _productAddRequestValidator = productAddRequestValidator;
         _productUpdateRequestValidator = productUpdateRequestValidator;
         _productRepository = productRepository;
         _mapper = mapper;
+        _publisher = publisher;
     }
 
     public async Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync()
@@ -112,7 +117,23 @@ public class ProductService
 
         var product = _mapper.Map<Product>(productUpdateRequest);
 
+        var isProductNameChanged = !string.Equals(existingProduct.ProductName, product.ProductName, StringComparison.OrdinalIgnoreCase);
+
         var updatedProduct = await _productRepository.UpdateProductAsync(product);
+
+        if (isProductNameChanged)
+        {
+            var routingKey = "product.update.name";
+            var message = new ProductNameUpdatedMessage
+            (
+                ProductId: updatedProduct.ProductID,
+                NewProductName: updatedProduct.ProductName
+            );
+
+            await _publisher.PublishAsync(
+                message,
+                routingKey);
+        }
 
         var updatedProductResponse = _mapper.Map<ProductResponseDto>(updatedProduct);
 

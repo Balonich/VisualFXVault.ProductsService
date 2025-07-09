@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BusinessLogicLayer.DTOs;
 using BusinessLogicLayer.Mappers;
+using BusinessLogicLayer.MessageQueue.Implementations;
+using BusinessLogicLayer.MessageQueue.Interfaces;
 using BusinessLogicLayer.Services;
 using BusinessLogicLayer.Validators;
 using FluentValidation;
@@ -16,6 +13,7 @@ public static class DependencyInjection
     public static IServiceCollection AddBusinessLogicLayer(this IServiceCollection services)
     {
         services.AddScoped<ProductService>();
+        services.AddScoped<IPublisher, Publisher>();
 
         services.AddValidatorsFromAssemblyContaining<ProductAddRequestValidator>();
 

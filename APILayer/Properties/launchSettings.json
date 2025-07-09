@@ -10,9 +10,14 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SQLSERVER_HOST": "localhost",
         "SQLSERVER_PORT": "1433",
-        "SQLSERVER_DATABASE": "VisualFXVault.Product",
-        "SQLSERVER_USER": "nlarushkin",
-        "SQLSERVER_PASSWORD": "Balonich05_31!"
+        "SQLSERVER_DATABASE": "VisualFXVault.ProductsService",
+        "SQLSERVER_USER": "sa",
+        "SQLSERVER_PASSWORD": "pa55w0Rd",
+        "RABBITMQ_HOST": "rabbitmq-container",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "rabbitmq-vfx",
+        "RABBITMQ_PASSWORD": "pa55w0Rd",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "products.exchange"
       }
     },
     "https": {

@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using BusinessLogicLayer.MessageQueue.Interfaces;
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
@@ -32,9 +34,16 @@ public class Publisher : IPublisher, IDisposable
         _channel = _connection.CreateChannelAsync().Result;
     }
 
-    public void Publish<T>(T message, string routingKey) where T : class
+    public async Task PublishAsync<T>(T message, string routingKey) where T : class
     {
-        throw new NotImplementedException();
+        var exchangeName = _configuration["RABBITMQ_PRODUCTS_EXCHANGE"]!;
+
+        var jsonMessage = JsonSerializer.Serialize(message);
+        var body = Encoding.UTF8.GetBytes(jsonMessage);
+
+        await _channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Direct, durable: true);
+
+        await _channel.BasicPublishAsync(exchange: exchangeName, routingKey: routingKey, body: body);
     }
 
     public void Dispose()
